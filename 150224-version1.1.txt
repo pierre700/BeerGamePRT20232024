@@ -1,0 +1,28 @@
+#Version 1.1 changement :
+
+##Ajout
+
+-Ajout d'un 5eme joueur, ce joueur est un maitre du jeu dynamique 
+-Création de l'interface du maitre du jeu 
+-Ce 5eme peut modifier de manière dynamique les délai de livraison entre chaque acteurs
+-Ajout dans l'interface de créattion de partie d'ajouter un délai de livraison par défaut (feature uniquement graphique) 
+-Ajout d'une fonction fillBuffer qui doit stocker les quantité à livrer et le tour à laquel la livraison doit etre faite 
+-Ajout dans la page de sélection des roles afin d'ajouter un icone affectant le role du maitre du jeu 
+
+
+##Modification 
+
+###Modification de la foction CalculateNewValues (utilisé pour changer la valeur des stocks):
+####Ancien :
+
+-Livraison avec un délai constant de 2 tours 
+-Commande stocké dans un pile de type FIFO
+
+####Nouveau :
+
+-Lis la valeur de la commande du tour actuel dans un array générer par fillBuffer 
+-change la valeur des stocks du livreur et du receveur en fonction de la commande 
+-Mise en place de cas spéciaux pour les roles: producteur et détaillant 
+
+
+
