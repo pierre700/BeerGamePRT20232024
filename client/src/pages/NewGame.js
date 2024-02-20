@@ -266,39 +266,48 @@ function NewGame(props) {
                     <>
                         <span>Choisissez un rôle:</span>
                         <div className={"select_role"}>
-                            <Tile
+                            <Tile 
+                                name={"Producer"}
                                 imgSrc={"/icons/factory.svg"}
                                 imgAlt={"New Game"}
                                 idKey={1}
                                 getValue={setSelectedRole}
                                 currentSelected={selectedRole}
                                 disabled={disabledRoles[0]}
+                                title="Producteur"
                             >Producteur</Tile>
-                            <Tile
+                            <Tile   
+                                name={"Distributor"}                            
                                 imgSrc={"/icons/box.svg"}
                                 imgAlt={"New Game"}
                                 idKey={2}
                                 getValue={setSelectedRole}
                                 currentSelected={selectedRole}
                                 disabled={disabledRoles[1]}
+                                title="Distributeur"
                             >Distributeur</Tile>
-                            <Tile
+                            <Tile      
+                                name={"Wholesaler"}                       
                                 imgSrc={"/icons/wholesale.svg"}
                                 imgAlt={"New Game"}
                                 idKey={3}
                                 getValue={setSelectedRole}
                                 currentSelected={selectedRole}
                                 disabled={disabledRoles[2]}
+                                title="Grossiste"
                             >Grossiste</Tile>
-                            <Tile
+                            <Tile       
+                                name={"Retailer"}                       
                                 imgSrc={"/icons/shop.svg"}
                                 imgAlt={"New Game"}
                                 idKey={4}
                                 getValue={setSelectedRole}
                                 currentSelected={selectedRole}
                                 disabled={disabledRoles[3]}
+                                title="Détaillant"
                             >Détaillant</Tile>
-                            <Tile
+                            <Tile       
+                                name={"MJ"}                  
                                 imgSrc={"/icons/GM.svg"}
                                 imgAlt={"New Game"}
                                 idKey={5}

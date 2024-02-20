@@ -214,7 +214,10 @@ function PlayGame(props) {
                         description={"Caractères autorisés: 0-9"}
                         disabled={true}
                     />
-                    <Button onClick={submitOrder}>Commande</Button>
+                    <Button 
+                    onClick={submitOrder}
+                    name={"OrderQuantityButton"}
+                    >Commande</Button>
                 </>
             )
         }

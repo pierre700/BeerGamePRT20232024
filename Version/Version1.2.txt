@@ -1,0 +1,9 @@
+Dans cette update, un bot qui repmlie les formulaires web seul à été créer
+pour l'utiliser il faut accéder au fichier form filler et lancer le fichier pyhton du meme nom 
+
+un modèle du jeu de la bière adapté en python à aussi été créer 
+il réalise la meme chose que le server mais plus rapidement et n'a pas besoin d'etre héberger
+il sera utiliser pour élaborer des modèles d'aide à la décision 
+
+grace au modèle python un nouvel algo de mise à jour des stock à été créer 
+celui de l'application web n'est pas correct à date de cette mise à jour 

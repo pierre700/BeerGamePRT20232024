@@ -2,7 +2,7 @@ export default function CalculateNewValues(RoleID, role, NextRole, currentRound,
   let
     newStock = role[currentRound].stock,
     newNextStock = NextRole.stock,
-    newRetard = role[currentRound].retard,
+    newRetard  = role[currentRound].retard,
     newNextRetard = NextRole.retard,
     currentOrder = 0,
     deliveryValueToNextRole = 0;
@@ -45,7 +45,7 @@ export default function CalculateNewValues(RoleID, role, NextRole, currentRound,
       newNextStock = 0
       newNextRetard = newNextRetard + diff
       
-    }
+    } 
     if (RoleID === 4){
       console.log("if5")
       if (newStock >= dmdCli){
