@@ -3,6 +3,7 @@ import mongoose from "mongoose";
 import DBGame from "../model/DBGame.js";
 import CalculateNewValues from "../functions/CalculateNewValues.js";
 import fillBuffer from "../functions/fillBuffer.js";
+import selectCommande from "../functions/selectCommande.js";
 
 export default function UpdateGame(io, socket, intData) {
     const room = intData.gameCode
@@ -39,28 +40,38 @@ export default function UpdateGame(io, socket, intData) {
                     producer.push({
                         stock: data.gameSettings.startStock,
                         order: parseInt(orderValue),
-                        retard: 0
+                        retard: 0,
+                        receptionNext : [0, 0, 0, 0]
+                    })
+                    data.roundData.buffer.push({
+                        bufferProd: bufferProducer, 
+                        bufferDistr: bufferDistributor,
+                        bufferWhole: bufferWholesaler,
+                        bufferRetail: bufferRetailer
                     })
                     break
                 case 2:
                     distributor.push({
                         stock: data.gameSettings.startStock,
                         order: parseInt(orderValue),
-                        retard: 0
+                        retard: 0,
+                        receptionNext : [0, 0, 0, 0]
                     })
                     break
                 case 3:
                     wholesaler.push({
                         stock: data.gameSettings.startStock,
                         order: parseInt(orderValue),
-                        retard: 0
+                        retard: 0,
+                        receptionNext : [0, 0, 0, 0]
                     })
                     break
                 case 4:
                     retailer.push({
                         stock: data.gameSettings.startStock,
                         order: parseInt(orderValue),
-                        retard: 0
+                        retard: 0,
+                        receptionNext : [0, 0, 0, 0]
                     })
                     break
                 case 5: 
@@ -79,28 +90,36 @@ export default function UpdateGame(io, socket, intData) {
                     producer.push({
                         stock: producer[currentRound-1].stock,
                         order: parseInt(orderValue),
-                        retard: producer[currentRound-1].retard
+                        retard: producer[currentRound-1].retard,
+                        receptionNext : producer[currentRound-1].receptionNext
+                        //selectCommande(currentRound , data.roundData.buffer[currentRound-1].bufferProd)
                     })
                     break
                 case 2:
                     distributor.push({
                         stock: distributor[currentRound-1].stock,
                         order: parseInt(orderValue),
-                        retard: distributor[currentRound-1].retard
+                        retard: distributor[currentRound-1].retard,
+                        receptionNext : distributor[currentRound-1].receptionNext
+                        //selectCommande(currentRound , data.roundData.buffer[currentRound-1].bufferDistr)
                     })
                     break
                 case 3:
                     wholesaler.push({
                         stock: wholesaler[currentRound-1].stock,
                         order: parseInt(orderValue),
-                        retard: wholesaler[currentRound-1].retard
+                        retard: wholesaler[currentRound-1].retard,
+                        receptionNext : wholesaler[currentRound-1].receptionNext
+                        //selectCommande(currentRound , data.roundData.buffer[currentRound-1].bufferWhole)
                     })
                     break
                 case 4:
                     retailer.push({
                         stock: retailer[currentRound-1].stock,
                         order: parseInt(orderValue),
-                        retard: retailer[currentRound-1].retard
+                        retard: retailer[currentRound-1].retard,
+                        receptionNext : retailer[currentRound-1].receptionNext
+                         //selectCommande(currentRound , data.roundData.buffer[currentRound-1].bufferRetail)
                     })
                     break
                 case 5: 
@@ -136,23 +155,20 @@ export default function UpdateGame(io, socket, intData) {
 
             let values = [], delivery = 0, demandClient=0
 
-            if (currentRound === 0){
-                bufferProducer = []
-                bufferDistributor = []
-                bufferWholesaler = []
-                bufferWholesaler = []
-            }
-            else{
-                bufferProducer = data.roundData.buffer[currentRound-1].bufferProd
-                bufferDistributor = data.roundData.buffer[currentRound-1].bufferDistr
-                bufferWholesaler = data.roundData.buffer[currentRound-1].bufferWhole
-                bufferRetailer = data.roundData.buffer[currentRound-1].bufferRetail
-            }
+            bufferProducer = data.roundData.buffer[currentRound].bufferProd
+            bufferDistributor = data.roundData.buffer[currentRound].bufferDistr
+            bufferWholesaler = data.roundData.buffer[currentRound].bufferWhole
+            bufferRetailer = data.roundData.buffer[currentRound].bufferRetail
 
             bufferProducer = fillBuffer(currentRound, MJ[currentRound].prodDelay, producer[currentRound].order, bufferProducer)
             bufferDistributor = fillBuffer(currentRound, MJ[currentRound].distrDelay, distributor[currentRound].order, bufferDistributor)
             bufferWholesaler = fillBuffer(currentRound, MJ[currentRound].wholeDelay, wholesaler[currentRound].order, bufferWholesaler)
             bufferRetailer = fillBuffer(currentRound, MJ[currentRound].retailDelay, retailer[currentRound].order, bufferRetailer)
+
+            data.roundData.buffer[currentRound].bufferProd = bufferProducer 
+            data.roundData.buffer[currentRound].bufferDistr = bufferDistributor
+            data.roundData.buffer[currentRound].bufferWhole = bufferWholesaler
+            data.roundData.buffer[currentRound].bufferRetail = bufferRetailer
 
             data.roundData.buffer.push({
                 bufferProd: bufferProducer, 
@@ -161,18 +177,22 @@ export default function UpdateGame(io, socket, intData) {
                 bufferRetail: bufferRetailer
             })
 
+            producer[currentRound].receptionNext = selectCommande(currentRound , data.roundData.buffer[currentRound].bufferProd)
+            distributor[currentRound].receptionNext = selectCommande(currentRound , data.roundData.buffer[currentRound].bufferDistr)
+            wholesaler[currentRound].receptionNext = selectCommande(currentRound , data.roundData.buffer[currentRound].bufferWhole)
+            retailer[currentRound].receptionNext = selectCommande(currentRound , data.roundData.buffer[currentRound].bufferRetail)
 
             console.log(bufferProducer, bufferDistributor, bufferWholesaler, bufferRetailer)
 
-            values = CalculateNewValues(1, producer, distributor[currentRound], currentRound, bufferProducer, false)
+            values = CalculateNewValues(1, producer, currentRound, bufferProducer, bufferDistributor, false, false)
             producer = values[0]
             delivery = values[1]
 
-            values = CalculateNewValues(2, distributor, producer[currentRound], currentRound, bufferDistributor, false)
+            values = CalculateNewValues(2, distributor, currentRound, bufferDistributor, bufferWholesaler, false, delivery)
             distributor = values[0]
             delivery = values[1]
 
-            values = CalculateNewValues(3, wholesaler, distributor[currentRound], currentRound, bufferWholesaler, false)
+            values = CalculateNewValues(3, wholesaler, currentRound, bufferWholesaler, bufferRetailer, false, delivery)
             wholesaler = values[0]
             delivery = values[1]
 
@@ -194,7 +214,7 @@ export default function UpdateGame(io, socket, intData) {
             //Todo: If calculated demand is negative, put the demand at 0
             demandClient = Math.round(sinCoeffB*Math.sin(2*3.14*sinFreqB*currentRound+sinPhaseB)+sinShiftB)
         }
-        values=CalculateNewValues(4, retailer, wholesaler[currentRound], currentRound, bufferRetailer, demandClient)
+        values=CalculateNewValues(4, retailer, currentRound, bufferRetailer, bufferWholesaler, demandClient, delivery)
         retailer = values[0]
         delivery = values[1]
 
