@@ -22,9 +22,9 @@ export default function fillBuffer(currentRound, delai, order, buff) {
                 buffer[j][1]=buffer[j][1]+order
             }
         }
-        if (cond === false){
-            buffer.push(arrayBuffer)
-            } 
+        }
+    if (cond === false){
+        buffer.push(arrayBuffer)
         }  
     return buffer  
 }

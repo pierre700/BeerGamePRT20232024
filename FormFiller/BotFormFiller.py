@@ -3,7 +3,7 @@ from time import sleep
 from selenium.webdriver.common.keys import Keys
 
 
-game_url = "http://192.168.137.1:3000"
+game_url = "http://192.168.70.88:3000"
 driver1 = webdriver.Chrome()
 driver2 = webdriver.Chrome()
 driver3 = webdriver.Chrome()
@@ -109,9 +109,8 @@ constValue = 1
 openMenu(driverList)
 GameCodeValue = getGameCode(file)
 fillParam(GameCodeValue, roundsValue, startStockValue, delayValue, typeDemandXpath, constValue)
-sleep(1)
 openRoom(driverList, GameCodeValue)
 chooseRole (driverList)
 print("play")
 sleep(2)
-#playGame(roundsValue+1, driverList)
+playGame(roundsValue+1, driverList)
