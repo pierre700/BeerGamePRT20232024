@@ -23,6 +23,11 @@ function PlayGame(props) {
     const [gameRounds, setGameRounds] = useState(0) //Tours de jeu (total)
     const [currentRound, setCurrentRound] = useState(0) //Tour de jeu actuel
     const [stock, setStock] = useState(0) //Inventaire
+    const [stock1, setStock1] = useState(0)
+    const [stock2, setStock2] = useState(0)
+    const [stock3, setStock3] = useState(0)
+    const [stock4, setStock4] = useState(0)
+    const [stockNext, setStockNext] = useState([])
     const [retard, setRetard] = useState(0) //Retard
     const [next1WeekDelivery, setNext1WeekDelivery] = useState(0) //Livraison la semaine prochaine
     const [next2WeekDelivery, setNext2WeekDelivery] = useState(0) //Livraison la semaine encore d'après
@@ -46,6 +51,7 @@ function PlayGame(props) {
                 setNext1WeekDelivery(data.roundData.producer[data.roundData.currentRound-1].next1Week)
                 setNext2WeekDelivery(data.roundData.producer[data.roundData.currentRound-1].next2Week)
                 setSupplyChainOrder(data.roundData.distributor[data.roundData.currentRound-1].order)
+                setStockNext(data.roundData.producer[data.roundData.currentRound-1].receptionNext)
             }
             else if(selectedRole === 2) {
                 setStock(data.roundData.distributor[data.roundData.currentRound-1].stock)
@@ -53,6 +59,7 @@ function PlayGame(props) {
                 setNext1WeekDelivery(data.roundData.distributor[data.roundData.currentRound-1].next1Week)
                 setNext2WeekDelivery(data.roundData.distributor[data.roundData.currentRound-1].next2Week)
                 setSupplyChainOrder(data.roundData.wholesaler[data.roundData.currentRound-1].order)
+                setStockNext(data.roundData.distributor[data.roundData.currentRound-1].receptionNext)
             }
             else if(selectedRole === 3) {
                 setStock(data.roundData.wholesaler[data.roundData.currentRound-1].stock)
@@ -60,15 +67,22 @@ function PlayGame(props) {
                 setNext1WeekDelivery(data.roundData.wholesaler[data.roundData.currentRound-1].next1Week)
                 setNext2WeekDelivery(data.roundData.wholesaler[data.roundData.currentRound-1].next2Week)
                 setSupplyChainOrder(data.roundData.retailer[data.roundData.currentRound-1].order)
+                setStockNext(data.roundData.wholesaler[data.roundData.currentRound-1].receptionNext)
             }
-            else {
+            else if(selectedRole ===4) {
                 setStock(data.roundData.retailer[data.roundData.currentRound-1].stock)
                 setRetard(data.roundData.retailer[data.roundData.currentRound-1].retard)
                 setNext1WeekDelivery(data.roundData.retailer[data.roundData.currentRound-1].next1Week)
                 setNext2WeekDelivery(data.roundData.retailer[data.roundData.currentRound-1].next2Week)
-                
                 setSupplyChainOrder(data.roundData.demandClient)
+                setStockNext(data.roundData.retailer[data.roundData.currentRound-1].receptionNext)
                 }
+            else {
+                setStock1(data.roundData.producer[data.roundData.currentRound-1].stock)
+                setStock2(data.roundData.distributor[data.roundData.currentRound-1].stock)
+                setStock3(data.roundData.wholesaler[data.roundData.currentRound-1].stock)
+                setStock4(data.roundData.retailer[data.roundData.currentRound-1].stock)
+            }
 
             
         })
@@ -76,6 +90,11 @@ function PlayGame(props) {
             console.log(data)
             setGameRounds(data.gameSettings.rounds)
             setStock(data.gameSettings.startStock)
+            setStock1(data.gameSettings.startStock)
+            setStock2(data.gameSettings.startStock)
+            setStock3(data.gameSettings.startStock)
+            setStock4(data.gameSettings.startStock)
+            setStockNext([0, 0, 0, 0])
         })
         socket.on("update_room_size", (data) => {
             setCurrentRoomSize(data.roomSize)
@@ -156,7 +175,7 @@ function PlayGame(props) {
                         setValue={retailerDelay}
                         description={"Allowed Characters: 0-9"}
                     />
-                    <Button onClick={submitDelay}>Commande</Button>
+                    <Button onClick={submitDelay}>Valider</Button>
                 </>
             )
             orderInputAndButton = (
@@ -202,7 +221,7 @@ function PlayGame(props) {
                         description={"Allowed Characters: 0-9"}
                         disabled={true}
                     />
-                    <Button onClick={submitDelay}>Commande</Button>
+                    <Button onClick={submitDelay}>Valider</Button>
                 </>
             )
             orderInputAndButton = (
@@ -255,20 +274,26 @@ function PlayGame(props) {
                 <div>
                   <div className={"grid_play"}>
                     <div className={"playground"}>
-                      <div className={"timer"}>
-                        <p>Tour {currentRound}/{gameRounds}</p>
-                      </div>
-                      {/* ... other elements */}
-                      <div className={"line"} />
-                      <div className={"new_order"}>
-                        {/* Input fields for player delays */}
-                        <div>
+                        <div className={"timer"}>
+                            <p>Tour {currentRound}/{gameRounds}</p>
+                        </div>
+                        <div className={"wrapper_img"}>
+                            <img src={roleIcon} alt={"Icon"} />
+                            <span>{roleName}</span>
+                        </div>
+                        <div className={"line"} />
+                        <div className={"new_delay"}>
                             <span>Nouveaux délais :</span>
                             { delayInputAndButton }
                         </div>
-                      </div>
-                      <div className={"line"} />
-                      {/* ... other elements */}
+                        <div className={"etat_stock"}>
+                            <span>Stock </span>
+                            <span>Producteur: {stock1} </span>
+                            <span>Distributeur: {stock2} </span>
+                            <span>Grossiste: {stock3} </span>
+                            <span>Détaillant: {stock4} </span>
+                        </div>
+                        <div className={"line"} />
                     </div>
                   </div>
                 </div>
@@ -300,8 +325,10 @@ function PlayGame(props) {
                                 <>
                                     <span>Livraison :</span>
                                     <div className={"next_products"}>
-                                        <span>La semaine prochaine : {next1WeekDelivery}</span>
-                                        <span>La semaine après : {next2WeekDelivery}</span>
+                                        <span>Ajd : {stockNext[0]}</span>
+                                        <span>Semaine 1 : {stockNext[1]}</span>
+                                        <span>Semaine 2 : {stockNext[2]}</span>
+                                        <span>Semaine 3 : {stockNext[3]}</span>
                                     </div>
                                 </>
                                 <div className={"line"} />
@@ -312,6 +339,11 @@ function PlayGame(props) {
                         </div>
 
                     <div>&nbsp;</div>
+
+                    <div className={"grid_play3"}>
+                        <div className={"playground3"}>
+                        </div>
+                    </div>
 
                     <div className={"grid_play2"}>
                         <div className={"playground2"}>
@@ -344,5 +376,6 @@ function PlayGame(props) {
 }
 
 }
+
 
 export default PlayGame
